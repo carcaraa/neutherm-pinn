@@ -1,0 +1,85 @@
+# NeuTherm-PINN default configuration
+# All physical parameters use SI units unless noted otherwise
+
+geometry:
+  r_fuel: 0.4096e-2       # Fuel pellet radius [m] (typical PWR: ~4.1 mm)
+  r_clad: 0.4750e-2       # Cladding outer radius [m]
+  n_radial: 100            # Number of radial mesh points
+
+physics:
+  # Reference cross sections at T_ref (cm^-1) — typical UO2 enriched to ~3.5%
+  T_ref: 300.0             # Reference temperature [K]
+
+  # Group 1 (fast)
+  D1_ref: 1.255            # Diffusion coefficient [cm]
+  sigma_r1_ref: 0.0265     # Removal cross section [cm^-1]
+  nu_sigma_f1_ref: 0.0081  # nu*Sigma_f [cm^-1]
+
+  # Group 2 (thermal)
+  D2_ref: 0.211            # Diffusion coefficient [cm]
+  sigma_a2_ref: 0.0750     # Absorption cross section [cm^-1]
+  nu_sigma_f2_ref: 0.135   # nu*Sigma_f [cm^-1]
+  sigma_s12_ref: 0.0177    # Scattering 1->2 [cm^-1]
+
+  # Doppler temperature coefficients (sqrt model)
+  alpha_a2: -2.0e-4        # Absorption group 2
+  alpha_f2: -1.8e-4        # Fission group 2
+  alpha_f1: -0.5e-4        # Fission group 1
+
+  # Fuel thermal properties (UO2)
+  kappa_fission: 3.204e-11 # Energy per fission [J]
+  # k_f(T) = 1/(A + B*T) + C*T^3
+  fuel_k_A: 0.0375         # [m·K/W]
+  fuel_k_B: 2.165e-4       # [m/W]
+  fuel_k_C: 4.715e-12      # [W/(m·K^4)]
+
+  # Boundary conditions
+  T_coolant: 580.0         # Bulk coolant temperature [K]
+  h_gap: 5000.0            # Gap conductance [W/(m^2·K)]
+  h_conv: 30000.0          # Coolant HTC [W/(m^2·K)]
+
+solver:
+  max_picard_iter: 200     # Max outer iterations
+  tol_temperature: 1.0e-5  # Relative convergence on T
+  tol_keff: 1.0e-6         # Relative convergence on k_eff
+  power_iteration_tol: 1.0e-7
+  power_iteration_max: 500
+
+dataset:
+  n_samples: 5000          # Number of parameter samples
+  sampling: "latin_hypercube"
+  # Parameter variation ranges (relative to reference)
+  vary_T_coolant: [550.0, 620.0]
+  vary_r_fuel: [0.38e-2, 0.44e-2]
+  vary_enrichment_factor: [0.8, 1.2]  # Multiplier on nu_sigma_f
+
+surrogate:
+  architecture: "fnn"      # "fnn" or "deeponet"
+  hidden_layers: [128, 128, 128, 128]
+  activation: "tanh"
+  learning_rate: 1.0e-3
+  batch_size: 256
+  epochs: 5000
+  scheduler: "cosine"
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+
+pinn:
+  hidden_layers: [64, 64, 64, 64]
+  activation: "tanh"
+  learning_rate: 1.0e-3
+  n_collocation: 2000      # Interior collocation points
+  n_boundary: 50           # Boundary points
+  epochs: 20000
+  # Loss weights
+  lambda_pde: 1.0
+  lambda_bc: 10.0
+  lambda_data: 0.1         # Weight for optional data term
+  adaptive_weights: true   # Use inverse Dirichlet weighting
+
+output:
+  results_dir: "results/"
+  data_dir: "data/"
+  save_every: 1000         # Save checkpoint every N epochs
+  plot_every: 500
