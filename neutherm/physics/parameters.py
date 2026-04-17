@@ -20,11 +20,19 @@ import yaml
 
 @dataclass
 class GeometryParams:
-    """Fuel pin geometry (1D radial, cylindrical)."""
+    """Fuel pin cell geometry (1D radial, cylindrical).
+
+    The pin cell model includes fuel, cladding, and the equivalent
+    annular moderator region out to the Wigner-Seitz cell radius.
+    For a square lattice with pitch p, the equivalent radius is:
+        r_cell = p / sqrt(π)
+    """
 
     r_fuel: float = 0.4096e-2  # Fuel pellet radius [m]
     r_clad: float = 0.4750e-2  # Cladding outer radius [m]
-    n_radial: int = 100  # Number of radial mesh points
+    r_cell: float = 0.7174e-2  # Pin cell equivalent radius [m] (pitch ~1.27 cm)
+    n_radial: int = 100  # Number of radial mesh points in fuel
+    n_radial_mod: int = 40  # Number of radial mesh points in moderator
 
 
 @dataclass
@@ -56,6 +64,14 @@ class NeutronicsParams:
     alpha_a2: float = -2.0e-4  # Absorption group 2
     alpha_f2: float = -1.8e-4  # Fission group 2
     alpha_f1: float = -0.5e-4  # Fission group 1
+
+    # Moderator (water) cross sections — temperature-independent
+    # These are homogenized values for light water at ~580 K
+    D1_mod: float = 1.13  # Fast diffusion coefficient [cm]
+    D2_mod: float = 0.16  # Thermal diffusion coefficient [cm]
+    sigma_r1_mod: float = 0.0494  # Fast removal [cm^-1]
+    sigma_a2_mod: float = 0.0197  # Thermal absorption [cm^-1]
+    sigma_s12_mod: float = 0.0487  # Down-scattering 1→2 [cm^-1]
 
 
 @dataclass
@@ -221,6 +237,10 @@ class ProblemConfig:
             raise ValueError(
                 f"Invalid geometry: r_fuel={g.r_fuel}, r_clad={g.r_clad}. "
                 "Need 0 < r_fuel < r_clad."
+            )
+        if g.r_cell <= g.r_clad:
+            raise ValueError(
+                f"Invalid geometry: r_cell={g.r_cell} must be > r_clad={g.r_clad}."
             )
         if g.n_radial < 10:
             raise ValueError(f"n_radial={g.n_radial} too coarse. Use at least 10.")

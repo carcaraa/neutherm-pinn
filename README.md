@@ -30,7 +30,7 @@ We consider a single cylindrical fuel pin of radius $R_f$ surrounded by a claddi
 - **Temperature-dependent** macroscopic cross sections (Doppler feedback)
 - **No azimuthal dependence** (symmetry)
 
-This configuration captures the essential physics of the neutron–thermal coupling: fission neutrons deposit energy in the fuel, raising the temperature, which in turn modifies the neutron interaction cross sections — creating a nonlinear feedback loop.
+This configuration captures the essential physics of the neutron–thermal coupling: fission neutrons deposit energy in the fuel, raising the temperature, which in turn modifies the neutron interaction cross sections, creating a nonlinear feedback loop.
 
 ### Governing Equations
 
@@ -206,7 +206,7 @@ NeuTherm-PINN/
 ## Installation
 
 ```bash
-git clone https://github.com/<your-username>/NeuTherm-PINN.git
+git clone https://github.com/carcaraa/NeuTherm-PINN.git
 cd NeuTherm-PINN
 pip install -e ".[dev]"
 ```

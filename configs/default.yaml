@@ -4,18 +4,22 @@
 geometry:
   r_fuel: 0.4096e-2       # Fuel pellet radius [m] (typical PWR: ~4.1 mm)
   r_clad: 0.4750e-2       # Cladding outer radius [m]
-  n_radial: 100            # Number of radial mesh points
+  r_cell: 0.7174e-2       # Pin cell equivalent radius [m] (pitch 1.27 cm)
+  n_radial: 100            # Radial mesh points in fuel region
+  n_radial_mod: 40         # Radial mesh points in moderator region
 
 physics:
-  # Reference cross sections at T_ref (cm^-1) — typical UO2 enriched to ~3.5%
+  # Reference cross sections at T_ref (cm^-1)
+  # Fuel region: UO2 enriched to ~3.5%, heterogeneous pin cell values
+  # Based on typical 2-group PWR benchmark data
   T_ref: 300.0             # Reference temperature [K]
 
-  # Group 1 (fast)
+  # Group 1 (fast) — fuel
   D1_ref: 1.255            # Diffusion coefficient [cm]
   sigma_r1_ref: 0.0265     # Removal cross section [cm^-1]
   nu_sigma_f1_ref: 0.0081  # nu*Sigma_f [cm^-1]
 
-  # Group 2 (thermal)
+  # Group 2 (thermal) — fuel
   D2_ref: 0.211            # Diffusion coefficient [cm]
   sigma_a2_ref: 0.0750     # Absorption cross section [cm^-1]
   nu_sigma_f2_ref: 0.135   # nu*Sigma_f [cm^-1]
@@ -25,6 +29,15 @@ physics:
   alpha_a2: -2.0e-4        # Absorption group 2
   alpha_f2: -1.8e-4        # Fission group 2
   alpha_f1: -0.5e-4        # Fission group 1
+
+  # Moderator (light water) cross sections at operating conditions (~580 K)
+  # Water is an excellent moderator: high scattering, high down-scatter,
+  # low absorption. These values reflect the heterogeneous pin cell.
+  D1_mod: 1.20             # Fast diffusion coefficient [cm]
+  D2_mod: 0.24             # Thermal diffusion coefficient [cm]
+  sigma_r1_mod: 0.0320     # Fast removal [cm^-1]
+  sigma_a2_mod: 0.0100     # Thermal absorption [cm^-1] (water absorbs very little)
+  sigma_s12_mod: 0.0300    # Down-scattering 1->2 [cm^-1]
 
   # Fuel thermal properties (UO2)
   kappa_fission: 3.204e-11 # Energy per fission [J]
