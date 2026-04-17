@@ -206,8 +206,8 @@ NeuTherm-PINN/
 ## Installation
 
 ```bash
-git clone https://github.com/<your-username>/NeuTherm-PINN.git
-cd NeuTherm-PINN
+git clone https://github.com/carcaraa/neutherm-pinn.git
+cd neutherm-pinn
 pip install -e ".[dev]"
 ```
 
@@ -222,22 +222,55 @@ pip install -e ".[dev]"
 
 ---
 
+## Results
+
+### Reference Solver
+
+The coupled solver (Picard iteration) converges in 6 iterations for the default PWR pin cell configuration:
+
+| Parameter | Value |
+|-----------|-------|
+| $k_{\text{eff}}$ | 1.3009 |
+| $T_{\text{centerline}}$ | 1139 K |
+| $T_{\text{surface}}$ | 758 K |
+| $\Delta T_{\text{fuel}}$ | 381 K |
+| Picard iterations | 6 |
+
+### Model Comparison
+
+| Metric | Surrogate | PINN |
+|--------|-----------|------|
+| $k_{\text{eff}}$ | 1.3009 | 1.5069 |
+| $k_{\text{eff}}$ relative error | 0.001% | 15.8% |
+| $\phi_1$ relative L2 | 0.003% | — |
+| $\phi_2$ relative L2 | 0.003% | — |
+| Temperature relative L2 | 0.003% | 24.9% |
+| Training data required | 5000 samples | 0 |
+| Trainable parameters | 115,709 | 12,803 |
+
+The surrogate achieves near-exact reproduction of the solver with <0.003% error on all fields. The PINN solves the fuel-only domain (without the moderator region), leading to a different eigenvalue — this is physically expected and demonstrates the sensitivity of $k_{\text{eff}}$ to the neutron moderation environment.
+
+---
+
 ## Usage
 
 ```bash
 # 1. Run the reference coupled solver
 python -m neutherm.solvers.coupled_solver --config configs/default.yaml
 
-# 2. Generate training data (5000 Latin Hypercube samples)
+# 2. Generate training data (5000 Latin Hypercube samples, ~42s)
 python -m neutherm.training.dataset --config configs/default.yaml --n-samples 5000 --output data/dataset.npz
 
-# 3. Train the surrogate model
+# 3. Train the surrogate model (~2 min on GPU)
 python -m neutherm.training.train_surrogate --config configs/default.yaml --data data/dataset.npz --output results/surrogate_model.pt
 
-# 4. Train the PINN (coming soon)
-python -m neutherm.training.train_pinn --config configs/default.yaml
+# 4. Train the PINN — pure physics (no data)
+python -m neutherm.training.train_pinn --config configs/default.yaml --output results/pinn_model.pt
 
-# 5. Compare results (coming soon)
+# 4b. Train the PINN — hybrid (physics + reference data)
+python -m neutherm.training.train_pinn --config configs/default.yaml --with-data --output results/pinn_model.pt
+
+# 5. Compare all three approaches
 python -m neutherm.evaluation.compare --config configs/default.yaml
 ```
 
@@ -250,9 +283,9 @@ python -m neutherm.evaluation.compare --config configs/default.yaml
 - [x] Reference numerical solver (FD + Picard)
 - [x] Training data generation (5000 LHS samples)
 - [x] Surrogate model (FNN with residual blocks)
-- [ ] Physics-informed neural network (PINN)
-- [ ] Benchmarking and analysis
-- [ ] Documentation and notebooks
+- [x] Physics-informed neural network (PINN)
+- [x] Benchmarking and analysis
+- [x] Documentation
 
 ---
 
@@ -289,9 +322,9 @@ If you use this code in your research, please cite:
 ```bibtex
 @software{neutherm_pinn_2026,
   title  = {NeuTherm-PINN: Physics-Informed Neural Networks for Coupled Neutronics-Thermal Hydraulics},
-  author = {<Your Name>},
+  author = {Hughes, Guilherme de Sena},
   year   = {2026},
-  url    = {https://github.com/<your-username>/NeuTherm-PINN}
+  url    = {https://github.com/carcaraa/neutherm-pinn}
 }
 ```
 
