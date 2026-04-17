@@ -30,7 +30,7 @@ We consider a single cylindrical fuel pin of radius $R_f$ surrounded by a claddi
 - **Temperature-dependent** macroscopic cross sections (Doppler feedback)
 - **No azimuthal dependence** (symmetry)
 
-This configuration captures the essential physics of the neutron–thermal coupling: fission neutrons deposit energy in the fuel, raising the temperature, which in turn modifies the neutron interaction cross sections, creating a nonlinear feedback loop.
+This configuration captures the essential physics of the neutron–thermal coupling: fission neutrons deposit energy in the fuel, raising the temperature, which in turn modifies the neutron interaction cross sections — creating a nonlinear feedback loop.
 
 ### Governing Equations
 
@@ -206,7 +206,7 @@ NeuTherm-PINN/
 ## Installation
 
 ```bash
-git clone https://github.com/carcaraa/NeuTherm-PINN.git
+git clone https://github.com/<your-username>/NeuTherm-PINN.git
 cd NeuTherm-PINN
 pip install -e ".[dev]"
 ```
@@ -225,19 +225,19 @@ pip install -e ".[dev]"
 ## Usage
 
 ```bash
-# 1. Run the reference solver
+# 1. Run the reference coupled solver
 python -m neutherm.solvers.coupled_solver --config configs/default.yaml
 
-# 2. Generate training data
-python -m neutherm.training.dataset --config configs/default.yaml --n-samples 5000
+# 2. Generate training data (5000 Latin Hypercube samples)
+python -m neutherm.training.dataset --config configs/default.yaml --n-samples 5000 --output data/dataset.npz
 
 # 3. Train the surrogate model
-python -m neutherm.training.train_surrogate --config configs/default.yaml
+python -m neutherm.training.train_surrogate --config configs/default.yaml --data data/dataset.npz --output results/surrogate_model.pt
 
-# 4. Train the PINN
+# 4. Train the PINN (coming soon)
 python -m neutherm.training.train_pinn --config configs/default.yaml
 
-# 5. Compare results
+# 5. Compare results (coming soon)
 python -m neutherm.evaluation.compare --config configs/default.yaml
 ```
 
@@ -246,10 +246,10 @@ python -m neutherm.evaluation.compare --config configs/default.yaml
 ## Roadmap
 
 - [x] Project structure and mathematical formulation
-- [ ] Physical models (cross sections, fuel properties)
-- [ ] Reference numerical solver (FD + Picard)
-- [ ] Training data generation
-- [ ] Surrogate model (FNN / DeepONet)
+- [x] Physical models (cross sections, fuel properties)
+- [x] Reference numerical solver (FD + Picard)
+- [x] Training data generation (5000 LHS samples)
+- [x] Surrogate model (FNN with residual blocks)
 - [ ] Physics-informed neural network (PINN)
 - [ ] Benchmarking and analysis
 - [ ] Documentation and notebooks
