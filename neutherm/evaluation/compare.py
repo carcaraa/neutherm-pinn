@@ -50,12 +50,16 @@ def load_surrogate(path: str, config: ProblemConfig, device: torch.device) -> Su
 def load_pinn(path: str, config: ProblemConfig, device: torch.device) -> tuple:
     """Load a trained PINN model from checkpoint."""
     checkpoint = torch.load(path, map_location=device, weights_only=False)
-    R_fuel_cm = config.geometry.r_fuel * 100
+
+    # Use checkpoint geometry if available, else fall back to config
+    r_fuel = checkpoint.get("r_fuel", config.geometry.r_fuel * 100)
+    r_cell = checkpoint.get("r_cell", config.geometry.r_cell * 100)
 
     model = PINNModel(
         hidden_layers=config.pinn.hidden_layers,
         activation=config.pinn.activation,
-        r_max=R_fuel_cm,
+        r_fuel=r_fuel,
+        r_cell=r_cell,
     ).to(device)
 
     model.load_state_dict(checkpoint["model_state_dict"])
