@@ -180,11 +180,7 @@ NeuTherm-PINN/
 │       └── plots.py             # Flux, temperature, loss curves
 │
 ├── notebooks/                   # Jupyter notebooks for exploration
-│   ├── 01_physics_validation.ipynb
-│   ├── 02_solver_verification.ipynb
-│   ├── 03_surrogate_training.ipynb
-│   ├── 04_pinn_training.ipynb
-│   └── 05_comparison_analysis.ipynb
+│   └── 01_walkthrough.ipynb     # Complete pipeline: solver → surrogate → PINN → comparison
 │
 ├── configs/                     # Experiment configurations
 │   └── default.yaml
