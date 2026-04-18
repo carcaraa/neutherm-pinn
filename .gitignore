@@ -25,3 +25,6 @@ results/*.pdf
 .env
 .venv/
 venv/
+
+# Keep comparison plot for README
+!results/comparison.png

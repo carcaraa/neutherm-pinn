@@ -250,6 +250,12 @@ The coupled solver (Picard iteration) converges in 6 iterations for the default 
 
 The surrogate achieves near-exact reproduction of the solver with <0.003% error on all fields. The PINN solves the fuel-only domain (without the moderator region), leading to a different eigenvalue — this is physically expected and demonstrates the sensitivity of $k_{\text{eff}}$ to the neutron moderation environment.
 
+### Comparison Plot
+
+![Solver vs Surrogate vs PINN](results/comparison.png)
+
+*Top row: field profiles (black = solver, blue dashed = surrogate, red dotted = PINN). Bottom row: pointwise relative errors.*
+
 ---
 
 ## Usage
